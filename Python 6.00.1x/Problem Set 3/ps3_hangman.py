@@ -111,7 +111,42 @@ def hangman(secretWord):
 
     Follows the other limitations detailed in the problem write-up.
     '''
-    # FILL IN YOUR CODE HERE...
+    print("Welcome to the game Hangman!")
+    print("I am thinking of a word that is", len(secretWord), "letters long.")
+    print("-------------")
+
+    leftGuesses = 8
+    lettersGuessed = []
+    while leftGuesses > 0:
+        if isWordGuessed(secretWord, lettersGuessed):
+            print("Congratulations, you won!")
+            break
+        
+        print("You have", leftGuesses, "guesses left.")
+        print("Available letters:", getAvailableLetters(lettersGuessed))
+
+        guss = input("Please guess a letter: ").lower()
+
+        if guss in lettersGuessed:
+            print("Oops! You've already guessed that letter: ", getGuessedWord(secretWord, lettersGuessed))
+            print("-------------")
+            continue
+        
+        lettersGuessed.append(guss)
+        
+        if guss in secretWord:
+            print("Good guess: ", getGuessedWord(secretWord, lettersGuessed))
+            print("-------------")
+            continue
+        else:
+            print("Oops! That letter is not in my word: ", getGuessedWord(secretWord, lettersGuessed))
+        
+        leftGuesses -= 1
+        print("-------------")
+
+    if leftGuesses == 0:
+        print("Sorry, you ran out of guesses. The word was else.")
+
 
 
 
@@ -122,5 +157,6 @@ def hangman(secretWord):
 # and run this file to test! (hint: you might want to pick your own
 # secretWord while you're testing)
 
-# secretWord = chooseWord(wordlist).lower()
-# hangman(secretWord)
+secretWord = chooseWord(wordlist).lower()
+secretWord = 'apple'
+hangman(secretWord)
