@@ -169,7 +169,18 @@ def average_perceptron(feature_matrix, labels, T):
             (averaged also over T iterations through the feature matrix).
     """
     # Your code here
-    raise NotImplementedError
+    theta = np.zeros(feature_matrix.shape[1])
+    theta_0 = 0
+    theta_sum = np.zeros(feature_matrix.shape[1])
+    theta_0_sum = 0
+    for t in range(T):
+        for i in get_order(feature_matrix.shape[0]):
+            # Your code here
+            theta, theta_0 = perceptron_single_step_update(feature_matrix[i], labels[i], theta, theta_0)
+            theta_sum += theta
+            theta_0_sum += theta_0
+    # Your code here
+    return theta_sum/(T*feature_matrix.shape[0]), theta_0_sum/(T*feature_matrix.shape[0])
 
 
 def pegasos_single_step_update(
