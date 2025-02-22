@@ -39,7 +39,8 @@ def hinge_loss_single(feature_vector, label, theta, theta_0):
         parameters.
     """
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
+    return max(0, 1-label*(np.dot(theta, feature_vector) + theta_0))
 
 
 
@@ -61,7 +62,14 @@ def hinge_loss_full(feature_matrix, labels, theta, theta_0):
     """
 
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
+    hinge_loss = 0
+
+    for i in range(len(labels)):
+        hinge_loss += hinge_loss_single(feature_matrix[i], labels[i], theta, theta_0)
+
+    return hinge_loss/len(labels)
+
 
 
 
@@ -88,8 +96,17 @@ def perceptron_single_step_update(
         the updated offset parameter `theta_0` as a floating point number
     """
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
+    epsilon = 1e-7
+    perceptron = label*(np.dot(current_theta, feature_vector) + current_theta_0)
+    theta = current_theta
+    theta_0 = current_theta_0
 
+    if perceptron <= epsilon:
+        theta = np.add(current_theta, label*feature_vector)
+        theta_0 = current_theta_0 + label
+
+    return theta, theta_0
 
 
 def perceptron(feature_matrix, labels, T):
@@ -115,14 +132,14 @@ def perceptron(feature_matrix, labels, T):
             (found also after T iterations through the feature matrix).
     """
     # Your code here
-    raise NotImplementedError
+    theta = np.zeros(feature_matrix.shape[1])
+    theta_0 = 0
     for t in range(T):
-        for i in get_order(nsamples):
+        for i in get_order(feature_matrix.shape[0]):
             # Your code here
-            raise NotImplementedError
+            theta, theta_0 = perceptron_single_step_update(feature_matrix[i], labels[i], theta, theta_0)
     # Your code here
-    raise NotImplementedError
-
+    return theta, theta_0
 
 
 def average_perceptron(feature_matrix, labels, T):
