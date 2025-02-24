@@ -297,17 +297,6 @@ def classify(feature_matrix, theta, theta_0):
         should be considered a positive classification.
     """
     # Your code here
-    result = np.zeros(feature_matrix.shape[1])
-    epsilon = 1e-7
-
-    for i in range(get_order(feature_matrix.shape[0])):
-        if np.dot(theta, feature_matrix[i]) + theta_0 >= epsilon:
-            result[i] = 1
-        else:
-            result[i] = -1
-
-    return result
-
     # 1. スコアを計算
     scores = np.dot(feature_matrix, theta) + theta_0
     epsilon = 1e-7
@@ -358,7 +347,14 @@ def classifier_accuracy(
         accuracy of the trained classifier on the validation data.
     """
     # Your code here
-    raise NotImplementedError
+    theta, theta_0 = classifier(train_feature_matrix, train_labels, **kwargs)
+    train_preds = classify(train_feature_matrix, theta, theta_0)
+    val_preds = classify(val_feature_matrix, theta, theta_0)
+    train_accuracy = accuracy(train_preds, train_labels)
+    val_accuracy = accuracy(val_preds, val_labels)
+
+
+    return train_accuracy, val_accuracy
 
 
 
@@ -417,7 +413,6 @@ def extract_bow_feature_vectors(reviews, indices_by_word, binarize=True):
         in the dictionary.
     """
     # Your code here
-    binarize = False # TODO: remove this line?
     feature_matrix = np.zeros([len(reviews), len(indices_by_word)], dtype=np.float64)
     for i, text in enumerate(reviews):
         word_list = extract_words(text)
@@ -426,7 +421,7 @@ def extract_bow_feature_vectors(reviews, indices_by_word, binarize=True):
             feature_matrix[i, indices_by_word[word]] += 1
     if binarize:
         # Your code here
-        raise NotImplementedError
+        feature_matrix[feature_matrix > 0] = 1
     return feature_matrix
 
 
