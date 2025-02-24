@@ -297,7 +297,31 @@ def classify(feature_matrix, theta, theta_0):
         should be considered a positive classification.
     """
     # Your code here
-    raise NotImplementedError
+    result = np.zeros(feature_matrix.shape[1])
+    epsilon = 1e-7
+
+    for i in range(get_order(feature_matrix.shape[0])):
+        if np.dot(theta, feature_matrix[i]) + theta_0 >= epsilon:
+            result[i] = 1
+        else:
+            result[i] = -1
+
+    return result
+
+    # 1. スコアを計算
+    scores = np.dot(feature_matrix, theta) + theta_0
+    epsilon = 1e-7
+    predictions = []
+    for val in scores:
+        if val >= epsilon:
+            predictions.append(1)
+        else:
+            predictions.append(-1)
+
+    return np.array(predictions)
+    
+
+
 
 
 def classifier_accuracy(
@@ -348,7 +372,7 @@ def extract_words(text):
         count as their own words.
     """
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
 
     for c in punctuation + digits:
         text = text.replace(c, ' ' + c + ' ')
@@ -368,14 +392,14 @@ def bag_of_words(texts, remove_stopword=False):
         integer `index`.
     """
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
     
     indices_by_word = {}  # maps word to unique index
     for text in texts:
         word_list = extract_words(text)
         for word in word_list:
             if word in indices_by_word: continue
-            if word in stopword: continue
+            # if word in stopword: continue
             indices_by_word[word] = len(indices_by_word)
 
     return indices_by_word
@@ -393,6 +417,7 @@ def extract_bow_feature_vectors(reviews, indices_by_word, binarize=True):
         in the dictionary.
     """
     # Your code here
+    binarize = False # TODO: remove this line?
     feature_matrix = np.zeros([len(reviews), len(indices_by_word)], dtype=np.float64)
     for i, text in enumerate(reviews):
         word_list = extract_words(text)
