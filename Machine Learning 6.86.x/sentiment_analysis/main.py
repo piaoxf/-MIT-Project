@@ -14,11 +14,15 @@ train_texts, train_labels = zip(*((sample['text'], sample['sentiment']) for samp
 val_texts, val_labels = zip(*((sample['text'], sample['sentiment']) for sample in val_data))
 test_texts, test_labels = zip(*((sample['text'], sample['sentiment']) for sample in test_data))
 
-dictionary = p1.bag_of_words(train_texts)
+# dictionary = p1.bag_of_words(train_texts)
+dictionary = p1.bag_of_words(train_texts, remove_stopword=True)
 
-train_bow_features = p1.extract_bow_feature_vectors(train_texts, dictionary)
-val_bow_features = p1.extract_bow_feature_vectors(val_texts, dictionary)
-test_bow_features = p1.extract_bow_feature_vectors(test_texts, dictionary)
+# train_bow_features = p1.extract_bow_feature_vectors(train_texts, dictionary)
+# val_bow_features = p1.extract_bow_feature_vectors(val_texts, dictionary)
+# test_bow_features = p1.extract_bow_feature_vectors(test_texts, dictionary)
+train_bow_features = p1.extract_bow_feature_vectors(train_texts, dictionary, binarize=False)
+val_bow_features = p1.extract_bow_feature_vectors(val_texts, dictionary, binarize=False)
+test_bow_features = p1.extract_bow_feature_vectors(test_texts, dictionary, binarize=False)
 
 #-------------------------------------------------------------------------------
 # Problem 5
@@ -110,14 +114,15 @@ test_bow_features = p1.extract_bow_feature_vectors(test_texts, dictionary)
 train_accuracy, test_accuracy = p1.classifier_accuracy(p1.pegasos, train_bow_features, test_bow_features, train_labels, test_labels, T=25, L=0.01)
 print("Training accuracy for Pegasos:", train_accuracy)
 print("Test accuracy for Pegasos:", test_accuracy)
+
 #-------------------------------------------------------------------------------
 # Assign to best_theta, the weights (and not the bias!) learned by your most
 # accurate algorithm with the optimal choice of hyperparameters.
 #-------------------------------------------------------------------------------
-theta, theta_0 = p1.pegasos(train_bow_features, train_labels, T=25, L=0.01)
-print(theta)
-best_theta = theta # Your code here
-wordlist   = [word for (idx, word) in sorted(zip(dictionary.values(), dictionary.keys()))]
-sorted_word_features = utils.most_explanatory_word(best_theta, wordlist)
-print("Most Explanatory Word Features")
-print(sorted_word_features[:10])
+# theta, theta_0 = p1.pegasos(train_bow_features, train_labels, T=25, L=0.01)
+# print(theta)
+# best_theta = theta # Your code here
+# wordlist   = [word for (idx, word) in sorted(zip(dictionary.values(), dictionary.keys()))]
+# sorted_word_features = utils.most_explanatory_word(best_theta, wordlist)
+# print("Most Explanatory Word Features")
+# print(sorted_word_features[:10])
