@@ -31,8 +31,11 @@ def compute_probabilities(X, theta, temp_parameter):
     Returns:
         H - (k, n) NumPy array, where each entry H[j][i] is the probability that X[i] is labeled as j
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    scores = theta @ X.T / temp_parameter
+    scores -= np.max(scores, axis = 0)
+    hex = np.exp(scores) / np.sum(np.exp(scores), axis = 0)
+    return hex
+
 
 def compute_cost_function(X, Y, theta, lambda_factor, temp_parameter):
     """
@@ -50,8 +53,10 @@ def compute_cost_function(X, Y, theta, lambda_factor, temp_parameter):
     Returns
         c - the cost value (scalar)
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    probabilities = compute_probabilities(X, theta, temp_parameter)
+    loss = -np.log(probabilities[Y, range(len(Y))])
+    regularization = lambda_factor / 2 * np.sum(theta ** 2)
+    return np.mean(loss) + regularization
 
 def run_gradient_descent_iteration(X, Y, theta, alpha, lambda_factor, temp_parameter):
     """
@@ -70,8 +75,21 @@ def run_gradient_descent_iteration(X, Y, theta, alpha, lambda_factor, temp_param
     Returns:
         theta - (k, d) NumPy array that is the final value of parameters theta
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    # 1 softmax
+    probabilities = compute_probabilities(X, theta, temp_parameter)
+
+    # 2 one-hot encodingを使って、indicator matrixを作る(k, n)
+    n, d = X.shape
+    k = theta.shape[0]
+    indicator = sparse.coo_matrix((np.ones(n), (Y, range(n))), shape = (k, n)).toarray()
+
+    # 3 gradient
+    grad = (-1/(temp_parameter * n)) * ((indicator - probabilities) @ X ) + lambda_factor * theta
+
+    # 4 update
+    theta -= alpha * grad
+    return theta
+
 
 def update_y(train_y, test_y):
     """
