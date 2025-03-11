@@ -7,7 +7,6 @@ def project_onto_PC(X, pcs, n_components, feature_means):
     Given principal component vectors pcs = principal_components(X)
     this function returns a new data array in which each sample in X
     has been projected onto the first n_components principcal components.
-    """
     # TODO: first center data using the feature_means
     # TODO: Return the projection of the centered dataset
     #       on the first n_components principal components.
@@ -16,7 +15,27 @@ def project_onto_PC(X, pcs, n_components, feature_means):
     #       of the eigenvectors returned by principal_components().
     #       Note that each eigenvector is already be a unit-vector,
     #       so the projection may be done using matrix multiplication.
-    raise NotImplementedError
+ 
+        Args:
+        X - (n, d) NumPy array, n datapoints each with d features
+        pcs - (d, d) NumPy array, principal components (each column is an eigenvector)
+        n_components - Number of principal components to use for projection
+        feature_means - (d, ) NumPy array, mean values of each feature (used for centering data)
+
+    Returns:
+        X_projected - (n, n_components) NumPy array, projection onto the first n_components PCs
+    """
+    # step 1: データを中心化（mean substraction）
+    X_centered = X - feature_means
+
+    # step 2: 主成分(pcs)の最初のn_components列を取得
+    pcs_n = pcs[:, :n_components]
+
+    # step 3: 中心化されたデータを主成分に射影
+    X_projected = np.dot(X_centered, pcs_n)
+
+    return X_projected
+
 
 
 ### Functions which are already complete, for you to use ###
