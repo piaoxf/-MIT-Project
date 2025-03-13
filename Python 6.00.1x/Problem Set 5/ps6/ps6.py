@@ -151,7 +151,10 @@ class PlaintextMessage(Message):
         Hint: consider using the parent class constructor so less 
         code is repeated
         '''
-        pass #delete this line and replace with your code here
+        Message.__init__(self, text)
+        self.shift = shift
+        self.encrypting_dict = self.build_shift_dict(shift)
+        self.message_text_encrypted = self.apply_shift(shift)
 
     def get_shift(self):
         '''
@@ -159,7 +162,7 @@ class PlaintextMessage(Message):
         
         Returns: self.shift
         '''
-        pass #delete this line and replace with your code here
+        return self.shift
 
     def get_encrypting_dict(self):
         '''
@@ -167,7 +170,7 @@ class PlaintextMessage(Message):
         
         Returns: a COPY of self.encrypting_dict
         '''
-        pass #delete this line and replace with your code here
+        return self.encrypting_dict.copy()
 
     def get_message_text_encrypted(self):
         '''
@@ -175,7 +178,7 @@ class PlaintextMessage(Message):
         
         Returns: self.message_text_encrypted
         '''
-        pass #delete this line and replace with your code here
+        return self.message_text_encrypted
 
     def change_shift(self, shift):
         '''
@@ -188,8 +191,9 @@ class PlaintextMessage(Message):
 
         Returns: nothing
         '''
-        pass #delete this line and replace with your code here
-
+        self.shift = shift
+        self.encrypting_dict =self.build_shift_dict(shift)
+        self.message_text_encrypted = self.apply_shift(shift)
 
 class CiphertextMessage(Message):
     def __init__(self, text):
@@ -202,7 +206,7 @@ class CiphertextMessage(Message):
             self.message_text (string, determined by input text)
             self.valid_words (list, determined using helper function load_words)
         '''
-        pass #delete this line and replace with your code here
+        Message.__init__(self, text)
 
     def decrypt_message(self):
         '''
@@ -220,7 +224,27 @@ class CiphertextMessage(Message):
         Returns: a tuple of the best shift value used to decrypt the message
         and the decrypted message text using that shift value
         '''
-        pass #delete this line and replace with your code here
+        bestShift = 0
+        bestWords = 0
+        bestText = ''
+        for s in range(26):
+            decryptedText = self.apply_shift(s)
+            words = decryptedText.split()
+            validWords = 0
+            for w in words:
+                if is_word(self.valid_words, w):
+                    validWords += 1
+            if validWords > bestWords:
+                bestShift = s
+                bestWords = validWords
+                bestText = decryptedText
+
+        return (bestShift, bestText)
+
+def decrypt_story():
+
+    chipertext = CiphertextMessage(get_story_string())
+    return chipertext.decrypt_message()
 
 #Example test case (PlaintextMessage)
 plaintext = PlaintextMessage('hello', 2)
@@ -236,3 +260,6 @@ print('Actual Output:', ciphertext.decrypt_message())
 message = Message('hello')
 print('Expected Output: hello')
 print('Actual Output:', message.build_shift_dict(2))
+
+worlds = load_words(WORDLIST_FILENAME)
+print('legalistic'in (worlds))
