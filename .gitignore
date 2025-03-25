@@ -11,3 +11,6 @@ Machine Learning 6.86.x/mnist/part1/theta.pkl.gz
 Machine Learning 6.86.x/mnist/__pycache__/utils.cpython-311.pyc
 Machine Learning 6.86.x/mnist/part2-mnist/__pycache__/train_utils.cpython-311.pyc
 Machine Learning 6.86.x/mnist/part2-mnist/mnist_model_fully_connected.pt
+Machine Learning 6.86.x/mnist/part2-twodigit/__pycache__/train_utils.cpython-311.pyc
+Machine Learning 6.86.x/mnist/part2-twodigit/__pycache__/utils_multiMNIST.cpython-311.pyc
+Machine Learning 6.86.x/mnist/part2-twodigit/mnist_model_fully_connected.pt

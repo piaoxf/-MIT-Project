@@ -37,25 +37,33 @@ def compute_accuracy(predictions, y):
 
 def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=False, n_epochs=30):
     """Train a model for N epochs given data and hyper-params."""
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)  # モデルをGPUへ送る
+
     # We optimize with SGD
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     for epoch in range(1, n_epochs + 1):
         print("-------------\nEpoch {}:\n".format(epoch))
 
         # Run **training***
-        loss, acc = run_epoch(train_data, model.train(), optimizer)
+        # loss, acc = run_epoch(train_data, model.train(), optimizer)
+        loss, acc = run_epoch(train_data, model.train(), optimizer, device)
         print('Train | loss1: {:.6f}  accuracy1: {:.6f} | loss2: {:.6f}  accuracy2: {:.6f}'.format(loss[0], acc[0], loss[1], acc[1]))
 
         # Run **validation**
-        val_loss, val_acc = run_epoch(dev_data, model.eval(), optimizer)
+        # val_loss, val_acc = run_epoch(dev_data, model.eval(), optimizer)
+        val_loss, val_acc = run_epoch(dev_data, model.eval(), optimizer, device)
         print('Valid | loss1: {:.6f}  accuracy1: {:.6f} | loss2: {:.6f}  accuracy2: {:.6f}'.format(val_loss[0], val_acc[0], val_loss[1], val_acc[1]))
 
         # Save model
-        torch.save(model, 'mnist_model_fully_connected.pt')
+        # torch.save(model, 'mnist_model_fully_connected.pt')
+        torch.save(model.state_dict(), 'mnist_model_fully_connected.pt')
 
 
-def run_epoch(data, model, optimizer):
+# def run_epoch(data, model, optimizer):
+def run_epoch(data, model, optimizer, device):
     """Train model for one pass of train data, and return loss, acccuracy"""
     # Gather losses
     losses_first_label = []
@@ -69,7 +77,8 @@ def run_epoch(data, model, optimizer):
     # Iterate through batches
     for batch in tqdm(data):
         # Grab x and y
-        x, y = batch['x'], batch['y']
+        # x, y = batch['x'], batch['y']
+        x, y = batch['x'].to(device), batch['y'].to(device)
 
         # Get output predictions for both the upper and lower numbers
         out1, out2 = model(x)
@@ -77,8 +86,10 @@ def run_epoch(data, model, optimizer):
         # Predict and store accuracy
         predictions_first_label = torch.argmax(out1, dim=1)
         predictions_second_label = torch.argmax(out2, dim=1)
-        batch_accuracies_first.append(compute_accuracy(predictions_first_label, y[0]))
-        batch_accuracies_second.append(compute_accuracy(predictions_second_label, y[1]))
+        # batch_accuracies_first.append(compute_accuracy(predictions_first_label, y[0]))
+        # batch_accuracies_second.append(compute_accuracy(predictions_second_label, y[1]))
+        batch_accuracies_first.append(compute_accuracy(predictions_first_label.cpu(), y[0].cpu()))
+        batch_accuracies_second.append(compute_accuracy(predictions_second_label.cpu(), y[1].cpu()))
 
         # Compute both losses
         loss1 = F.cross_entropy(out1, y[0])

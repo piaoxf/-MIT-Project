@@ -9,7 +9,7 @@ use_mini_dataset = True
 
 batch_size = 64
 nb_classes = 10
-nb_epoch = 30
+nb_epoch = 50
 num_classes = 10
 img_rows, img_cols = 42, 28 # input image dimensions
 
@@ -21,26 +21,46 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
         
         # hidden layers
-        self.conv = nn.Conv2d(input_dimension, 32, (3, 3))
-        self.maxpool = nn.MaxPool2d((2, 2))
-        self.dropout = nn.Dropout(p=0.5)
-        
-        # first output Layers 32 -> 10
-        self.linear1 = nn.Linear(32, 10)
+        self.con1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        # second output Layers 32 -> 10
-        self.linear2 = nn.Linear(32, 10)
+        # 32ch -> 64ch 3x3 kernel
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        
+        # dropout
+        self.dropout = nn.Dropout(p=0.5)
+
+        # Flatten layer (input: (64, 5, 5) -> output: 1600) 
+        self.flatten = Flatten()
+
+        # fully connected layers
+        
+        self.linear = nn.Linear(64 * 10 * 7, 128)
+
+        # first output layers 128 -> 10
+        self.first_digit = nn.Linear(128, 10)
+        self.second_digit = nn.Linear(128, 10)
 
     def forward(self, x):
 
-        # hidden activations
-        conv1_out = F.relu(self.conv(x))
-        hidden_out = F.max_pool2d(conv1_out, 2, 2)
-        dropout_out = self.dropout(hidden_out)
+        # conv1 -> relu -> maxpool
+        x = F.relu(self.con1(x))
+        x = self.pool(x)
+
+        # conv2 -> relu -> maxpool
+        x = F.relu(self.conv2(x))
+        x = self.pool(x)
+
+        # dropout
+        x = self.dropout(x)
+
+        # flatten
+        x = self.flatten(x)
+        x = F.relu(self.linear(x))
 
         # output
-        out_first_digit = F.relu(self.linear1(dropout_out))
-        out_second_digit = F.relu(self.linear2(dropout_out))
+        out_first_digit = F.leaky_relu(self.first_digit(x))
+        out_second_digit = F.leaky_relu(self.second_digit(x))
 
         return out_first_digit, out_second_digit
 
@@ -71,8 +91,10 @@ def main():
     # Train
     train_model(train_batches, dev_batches, model)
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)  # モデルをGPUへ送る
     ## Evaluate the model on test data
-    loss, acc = run_epoch(test_batches, model.eval(), None)
+    loss, acc = run_epoch(test_batches, model.eval(), None, device)
     print('Test loss1: {:.6f}  accuracy1: {:.6f}  loss2: {:.6f}   accuracy2: {:.6f}'.format(loss[0], acc[0], loss[1], acc[1]))
 
 if __name__ == '__main__':
