@@ -36,6 +36,14 @@ def epsilon_greedy(state_1, state_2, q_func, epsilon):
     """
     # TODO Your code here
     action_index, object_index = None, None
+    if np.random.rand < epsilon:
+        action_index = np.random.randint(NUM_ACTIONS)
+        object_index = np.random.randint(NUM_OBJECTS)
+    else:
+        q_values = q_func[state_1, state_2]
+        # argmaxは一次元と解釈した時最大値のindex, unravel_indexは配列の次元の中でその最大値のindexを取得
+        max_index = np.unravel_index(np.argmax(q_values), q_values.shape)
+        action_index, object_index = max_index
     return (action_index, object_index)
 
 
@@ -60,9 +68,17 @@ def tabular_q_learning(q_func, current_state_1, current_state_2, action_index,
     Returns:
         None
     """
-    # TODO Your code here
-    q_func[current_state_1, current_state_2, action_index,
-           object_index] = 0  # TODO Your update here
+    current_q_func = q_func[current_state_1, current_state_2, action_index, object_index]
+    q_func[current_state_1, current_state_2, action_index, object_index] = 0
+    # エピソード終了の場合、即時報酬
+    if terminal:
+        target = reward
+    else:
+        # 次状態における最大のQ
+        max_next_q = np.max(q_func[next_state_1, next_state_2])
+        target = reward + GAMMA * max_next_q
+    
+    q_func[current_state_1, current_state_2, action_index, object_index] = (1-ALPHA) * current_q_func + ALPHA * target
 
     return None  # This function shouldn't return anything
 
