@@ -36,7 +36,7 @@ def epsilon_greedy(state_1, state_2, q_func, epsilon):
     """
     # TODO Your code here
     action_index, object_index = None, None
-    if np.random.rand < epsilon:
+    if np.random.rand() < epsilon:
         action_index = np.random.randint(NUM_ACTIONS)
         object_index = np.random.randint(NUM_OBJECTS)
     else:
@@ -100,28 +100,42 @@ def run_episode(for_training):
     """
     epsilon = TRAINING_EP if for_training else TESTING_EP
 
-    epi_reward = None
+    epi_reward = 0.0
     # initialize for each episode
-    # TODO Your code here
+    discount = 1.0
 
     (current_room_desc, current_quest_desc, terminal) = framework.newGame()
 
     while not terminal:
         # Choose next action and execute
-        # TODO Your code here
+        # 現在状態をインデックスに変換
+        state_1 = dict_room_desc[current_room_desc]
+        state_2 = dict_quest_desc[current_quest_desc]
+
+        # ep-greedyに基づく行動選択
+        action_index, object_index = epsilon_greedy(state_1, state_2, q_func, epsilon)
+
+        # アクションを適用
+        (next_room_desc, next_quest_desc, reward, terminal) = framework.step_game(current_room_desc, current_quest_desc, action_index, object_index)
 
         if for_training:
             # update Q-function.
-            # TODO Your code here
-            pass
+            # 次状態をインデックスに変換
+            next_state_1 = dict_room_desc[next_room_desc]
+            next_state_2 = dict_quest_desc[next_quest_desc]
+            
+            # Q value update
+            tabular_q_learning(q_func, state_1, state_2, action_index, object_index, reward, next_state_1, next_state_2, terminal)
 
         if not for_training:
             # update reward
-            # TODO Your code here
-            pass
+            # 割引報酬を加算
+            epi_reward += discount * reward
+            discount *= GAMMA 
 
         # prepare next step
-        # TODO Your code here
+        current_room_desc = next_room_desc
+        current_quest_desc = next_quest_desc
 
     if not for_training:
         return epi_reward
